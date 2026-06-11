@@ -243,12 +243,12 @@ Perbedaan interface  dengan abstract adalah jika interface semua methode dan atr
 
 Beri tanda sesuai pemahaman kamu saat ini.
 
-| Topik | Belum paham | Mulai paham | Cukup paham |
-| --- | --- | --- | --- |
-| Basic syntax | [ ] | [ ] | [x] |
-| Class and object | [ ] | [x] | [ ] |
-| Field/method/constructor | [ ] | [ ] | [x] |
-| Access modifier | [ ] | [x] | [ ] |
-| Getter/setter | [ ] | [ ] | [x] |
-| List/Map | [ ] | [ ] | [x] |
-| Interface/abstract class | [ ] | [x] | [ ] |
+| Topik                    | Belum paham | Mulai paham | Cukup paham |
+| ------------------------ | ----------- | ----------- | ----------- |
+| Basic syntax             | [ ]         | [ ]         | [x]         |
+| Class and object         | [ ]         | [x]         | [ ]         |
+| Field/method/constructor | [ ]         | [ ]         | [x]         |
+| Access modifier          | [ ]         | [x]         | [ ]         |
+| Getter/setter            | [ ]         | [ ]         | [x]         |
+| List/Map                 | [ ]         | [ ]         | [x]         |
+| Interface/abstract class | [ ]         | [x]         | [ ]         |
