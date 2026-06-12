@@ -199,5 +199,5 @@ Business logic tidak ditaruh di controller untuk mempermudah proses debug atas e
 Jawaban:
 
 ```text
-Request/response perlu DTO karena kita ingin mengontrol bagaimana data masuk dan keluar dari aplikasi, bukan asal lempar data dari Entity (database).
+Request/response perlu DTO karena kita ingin mengontrol bagaimana data masuk dan keluar dari aplikasi, bukan asal lempar data dari Entity (database)
 ```
