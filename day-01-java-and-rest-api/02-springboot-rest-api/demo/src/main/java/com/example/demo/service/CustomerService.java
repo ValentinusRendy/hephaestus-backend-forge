@@ -56,6 +56,7 @@ public class CustomerService {
             response.setFullName(customer.getFullName());
             response.setEmail(customer.getEmail());
             response.setPhoneNumber(customer.getPhoneNumber());
+            response.setId(customer.getId());
 
             responses.add(response);
         }
@@ -78,16 +79,77 @@ public class CustomerService {
 		return response;
 	}
 
-	public CustomerResponse getCustomerResponseById(@PathVariable Long id){
+	public CustomerResponse getCustomerResponseById(Long id){
 		CustomerResponse response = new CustomerResponse();
 		Customer customer = customerStorage.get(id);
 
 		response.setFullName(customer.getFullName());
 		response.setEmail(customer.getEmail());
 		response.setPhoneNumber(customer.getPhoneNumber());
+        response.setId(customer.getId());
 
 		return response;
 	}
 
+    public String deleteCustomerResponseById(@PathVariable Long id){
+        customerStorage.remove(id);
+        return String.format("Berhasil menghapus customer dengan ID: %s", id);
+    }
+
+    public CustomerResponse putCustomerResponseById(@PathVariable Long id, @RequestBody CreateCustomerRequest request){
+
+        Customer customer = customerStorage.get(id);
+
+        if (request.getFullName() != null) {
+            customer.setFullName(request.getFullName());
+        } else{
+            customer.setFullName(customer.getFullName());
+        }
+
+        if (request.getEmail() != null) {
+            customer.setEmail(request.getEmail());
+        } else{
+            customer.setEmail(customer.getEmail());
+        }
+
+        if (request.getPhoneNumber() != null) {
+            customer.setPhoneNumber(request.getPhoneNumber());
+        } else{
+            customer.setPhoneNumber(customer.getPhoneNumber());
+        }
+        
+        CustomerResponse response = new CustomerResponse();
+
+        response.setFullName(customer.getFullName());
+        response.setEmail(customer.getEmail());
+        response.setPhoneNumber(customer.getPhoneNumber());
+        response.setId(customer.getId());
+
+        return response;
+    }    
     
+
+    public List<CustomerResponse> getCustomerResponsesByName(String name){
+
+    List<CustomerResponse> responses = new ArrayList<>();
+
+    for (Customer customer : customerStorage.values()){
+        if (customer.getFullName() != null && name != null && customer.getFullName().toLowerCase().contains(name.toLowerCase())) {
+
+            CustomerResponse response = new CustomerResponse();
+            response.setId(customer.getId());
+            response.setFullName(customer.getFullName());
+            response.setEmail(customer.getEmail());
+            response.setPhoneNumber(customer.getPhoneNumber());
+
+            responses.add(response);
+        }
+    }
+
+    return responses;
 }
+
+}
+
+   
+

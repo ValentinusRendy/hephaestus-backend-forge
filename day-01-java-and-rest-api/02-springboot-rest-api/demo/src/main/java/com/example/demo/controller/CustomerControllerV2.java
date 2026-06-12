@@ -4,11 +4,14 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.dto.CreateCustomerRequest;
@@ -32,8 +35,15 @@ class CustomerControllerV2{
     }
 	
     @GetMapping
-    public ResponseEntity<List<CustomerResponse>> getCustomers(){
-        return ResponseEntity.ok(customerService.getCustomers());
+    public ResponseEntity<List<CustomerResponse>> getCustomers(@RequestParam(required = false) String name) {
+
+        if (name != null) {
+            return ResponseEntity.ok(customerService.getCustomerResponsesByName(name));
+        }
+
+        return ResponseEntity.ok(
+            customerService.getCustomers()
+        );
     }
 
     
@@ -41,6 +51,17 @@ class CustomerControllerV2{
     public ResponseEntity<CustomerResponse> getCustomersById(@PathVariable Long id){
         return ResponseEntity.ok(customerService.getCustomerResponseById(id));
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteCustomerById(@PathVariable Long id){
+        return ResponseEntity.ok(customerService.deleteCustomerResponseById(id));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<CustomerResponse> putCustomerById(@PathVariable Long id, @RequestBody CreateCustomerRequest request){
+        return ResponseEntity.ok(customerService.putCustomerResponseById(id, request));
+    }
+
 
 
 }
