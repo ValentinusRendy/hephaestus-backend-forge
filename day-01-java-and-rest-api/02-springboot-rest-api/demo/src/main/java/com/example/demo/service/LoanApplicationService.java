@@ -8,19 +8,13 @@ import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
-import com.example.demo.dto.CustomerResponse;
 import com.example.demo.dto.LoanApplicationRequest;
 import com.example.demo.dto.LoanApplicationResponse;
 import com.example.demo.exception.BadRequestException;
-import com.example.demo.exception.CustomerNotFoundException;
-import com.example.demo.exception.ForbiddenException;
 import com.example.demo.exception.LoanApplicationNotFoundException;
 import com.example.demo.model.ApplicationStatus;
-import com.example.demo.model.Customer;
 import com.example.demo.model.LoanApplication;
 import com.example.demo.model.Role;
-import com.example.demo.model.User;
-import com.example.demo.security.AuthUtil;
 import com.example.demo.security.RoleValidation;
 
 import lombok.RequiredArgsConstructor;

@@ -27,12 +27,11 @@ public class JwtTokenProvider {
         this.expiration = expiration;
     }
 
-    // ✅ GENERATE TOKEN (pakai username sebagai subject)
     public String generate(User user) {
         Date now = new Date();
 
         return Jwts.builder()
-                .setSubject(user.getUsername()) // ✅ FIX: pakai username
+                .setSubject(user.getUsername()) 
                 .claim("role", user.getRole().name())
                 .setIssuedAt(now)
                 .setExpiration(new Date(now.getTime() + expiration))
@@ -40,12 +39,10 @@ public class JwtTokenProvider {
                 .compact();
     }
 
-    // ✅ AMBIL USERNAME DARI TOKEN
     public String getUsername(String token) {
         return claims(token).getSubject();
     }
 
-    // ✅ VALIDASI TOKEN
     public boolean valid(String token) {
         try {
             claims(token);
@@ -55,7 +52,6 @@ public class JwtTokenProvider {
         }
     }
 
-    // ✅ AMBIL CLAIMS
     private Claims claims(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(key)

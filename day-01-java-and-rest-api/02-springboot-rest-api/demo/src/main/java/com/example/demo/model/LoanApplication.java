@@ -23,12 +23,3 @@ public class LoanApplication {
 
     private ApplicationStatus status;
 }
-
-// {
-//   "id": 1,
-//   "customer_id": 1,
-//   "loan_amount": 5000000,
-//   "tenor_month": 12,
-//   "purpose": "Modal usaha",
-//   "status": "REJECTED"
-// }

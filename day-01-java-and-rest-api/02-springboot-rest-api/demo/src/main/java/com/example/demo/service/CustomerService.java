@@ -30,25 +30,53 @@ public class CustomerService {
     private Long sequence = 1L;
 
 
-    public List<CustomerResponse> getCustomers() {
+    public List<CustomerResponse> getCustomers(String name, String email) {
         roleValidation.assign(Role.ADMIN, Role.STAFF, Role.APPROVER);
 
         List<CustomerResponse> responses = new ArrayList<>();
 
+        boolean hasName = name != null && !name.isBlank();
+        boolean hasEmail = email != null && !email.isBlank();
+
         for (Customer customer : customerStorage.values()) {
 
-            CustomerResponse response = new CustomerResponse();
-            response.setFullName(customer.getFullName());
-            response.setEmail(customer.getEmail());
-            response.setPhoneNumber(customer.getPhoneNumber());
-            response.setId(customer.getId());
-            response.setCreatedAt(customer.getCreatedAt());
-            response.setUpdatedAt(customer.getUpdatedAt());
+            if (!hasName && !hasEmail) {
+                CustomerResponse response = new CustomerResponse();
+                response.setId(customer.getId());
+                response.setFullName(customer.getFullName());
+                response.setEmail(customer.getEmail());
+                response.setPhoneNumber(customer.getPhoneNumber());
+                response.setCreatedAt(customer.getCreatedAt());
+                response.setUpdatedAt(customer.getUpdatedAt());
 
-            responses.add(response);
+                responses.add(response);
+                continue;
+            }
+
+            boolean matchName = hasName
+                    && customer.getFullName() != null
+                    && customer.getFullName().toLowerCase().contains(name.toLowerCase());
+
+            boolean matchEmail = hasEmail
+                    && customer.getEmail() != null
+                    && customer.getEmail().toLowerCase().contains(email.toLowerCase());
+
+            if (matchName || matchEmail) {
+                CustomerResponse response = new CustomerResponse();
+                response.setId(customer.getId());
+                response.setFullName(customer.getFullName());
+                response.setEmail(customer.getEmail());
+                response.setPhoneNumber(customer.getPhoneNumber());
+                response.setCreatedAt(customer.getCreatedAt());
+                response.setUpdatedAt(customer.getUpdatedAt());
+
+                responses.add(response);
+            }
         }
+
         return responses;
     }
+
 
     public CustomerResponse createCustomer(CreateCustomerRequest request) {
         roleValidation.assign(Role.ADMIN, Role.STAFF);

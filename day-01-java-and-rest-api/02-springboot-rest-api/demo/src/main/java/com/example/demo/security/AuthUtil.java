@@ -1,7 +1,6 @@
 package com.example.demo.security;
 
 import com.example.demo.exception.ForbiddenException;
-import com.example.demo.model.Role;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.security.core.Authentication;

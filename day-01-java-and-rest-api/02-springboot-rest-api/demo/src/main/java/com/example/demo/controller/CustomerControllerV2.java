@@ -51,21 +51,18 @@ class CustomerControllerV2 {
     }
 
     @GetMapping
-    @Operation(summary = "Get all customers", description = "Retrieve all customers or filter by name")
+    @Operation(summary = "Get all customers", description = "Retrieve all customers or filter by name or by email")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Customers retrieved successfully"),
             @ApiResponse(responseCode = "400", description = "Invalid request parameter"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
+
     public ResponseEntity<List<CustomerResponse>> getCustomers(
-            @Valid @RequestParam(required = false) String name,
-            @Valid @RequestParam(required = false) String email) {
-
-        if ((name != null && !name.isBlank()) || (email != null && !email.isBlank())) {
-            return ResponseEntity.ok(customerService.getCustomerResponsesByNameOrEmail(name, email));
-        }
-
-        return ResponseEntity.ok(customerService.getCustomers());
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String email
+    ) {
+        return ResponseEntity.ok(customerService.getCustomers(name, email));
     }
 
     @GetMapping("/{id}")
