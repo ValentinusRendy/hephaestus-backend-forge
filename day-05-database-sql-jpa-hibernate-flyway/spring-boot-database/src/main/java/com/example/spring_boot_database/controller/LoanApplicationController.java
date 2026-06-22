@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
 import com.example.spring_boot_database.dto.*;
@@ -12,7 +13,7 @@ import com.example.spring_boot_database.service.LoanApplicationService;
 
 import jakarta.validation.Valid;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -40,12 +41,25 @@ public class LoanApplicationController {
         );
     }
 
+    /**
+     * Get all loan applications with optional filters:
+     * - status
+     * - startDate
+     * - endDate
+     *
+     * Example:
+     * GET /api/v1/loan-applications?status=SUBMITTED&startDate=2026-01-01&endDate=2026-01-31
+     */
     @GetMapping
     public ApiResponse<List<LoanApplicationResponse>> getAll(
-            @RequestParam(required = false) Status status) {
+            @RequestParam(required = false) Status status,
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
 
         return ApiResponse.success(
-                loanService.findLoan(status),
+                loanService.findLoan(status, startDate, endDate),
                 "Loan applications retrieved successfully"
         );
     }
@@ -71,11 +85,22 @@ public class LoanApplicationController {
         );
     }
 
+    /**
+     * Get paginated loan applications with optional filters:
+     * - status
+     * - startDate
+     * - endDate
+     *
+     * Example:
+     * GET /api/v1/loan-applications/paged?status=APPROVED&startDate=2026-01-01&endDate=2026-01-31&page=0&size=10
+     */
     @GetMapping("/paged")
     public ApiResponse<org.springframework.data.domain.Page<LoanApplicationResponse>> getPaged(
             @RequestParam(required = false) Status status,
-            @RequestParam(required = false) LocalDateTime startDate,
-            @RequestParam(required = false) LocalDateTime endDate,
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
 

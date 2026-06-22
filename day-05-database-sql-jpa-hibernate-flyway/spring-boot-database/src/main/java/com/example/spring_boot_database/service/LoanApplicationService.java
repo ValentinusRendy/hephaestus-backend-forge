@@ -1,8 +1,10 @@
 package com.example.spring_boot_database.service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+
 import jakarta.persistence.criteria.Predicate;
 
 import org.springframework.data.domain.Pageable;
@@ -61,14 +63,30 @@ public class LoanApplicationService {
         return toResponse(getById(id));
     }
 
+    /**
+     * Find loan applications by optional filters:
+     * - status
+     * - startDate
+     * - endDate
+     */
     @Transactional(readOnly = true)
-    public List<LoanApplicationResponse> findLoan(Status status) {
-        List<LoanApplicationEntity> data =
-                (status != null)
-                        ? loanRepo.findByStatus(status.name())
-                        : loanRepo.findAll();
+    public List<LoanApplicationResponse> findLoan(
+            Status status,
+            LocalDate startDate,
+            LocalDate endDate) {
 
-        return data.stream().map(this::toResponse).toList();
+        validateDateRange(startDate, endDate);
+
+        Specification<LoanApplicationEntity> spec = buildLoanSpecification(
+                status,
+                startDate,
+                endDate
+        );
+
+        return loanRepo.findAll(spec)
+                .stream()
+                .map(this::toResponse)
+                .toList();
     }
 
     @Transactional
@@ -87,6 +105,7 @@ public class LoanApplicationService {
 
         entity.setStatus(next.name());
         entity.setUpdatedAt(LocalDateTime.now());
+
         LoanApplicationEntity updated = loanRepo.save(entity);
 
         if (next == Status.DISBURSED) {
@@ -106,16 +125,19 @@ public class LoanApplicationService {
 
         switch (current) {
             case SUBMITTED -> {
-                if (!(next == Status.APPROVED || next == Status.REJECTED))
+                if (!(next == Status.APPROVED || next == Status.REJECTED)) {
                     throw new BadRequestException("Invalid transition");
+                }
             }
             case APPROVED -> {
-                if (next != Status.DISBURSED)
+                if (next != Status.DISBURSED) {
                     throw new BadRequestException("Invalid transition");
+                }
             }
             case DISBURSED -> {
-                if (next != Status.CLOSED)
+                if (next != Status.CLOSED) {
                     throw new BadRequestException("Invalid transition");
+                }
 
                 boolean allPaid = scheduleRepo.findByLoanApplicationId(entity.getId())
                         .stream()
@@ -125,6 +147,7 @@ public class LoanApplicationService {
                     throw new BadRequestException("Loan cannot be closed, not fully paid");
                 }
             }
+            default -> throw new BadRequestException("Invalid transition");
         }
     }
 
@@ -146,14 +169,37 @@ public class LoanApplicationService {
                 .build();
     }
 
+    /**
+     * Find loan applications with pagination and optional filters:
+     * - status
+     * - startDate
+     * - endDate
+     */
     @Transactional(readOnly = true)
     public Page<LoanApplicationResponse> findLoanPaged(
             Status status,
-            LocalDateTime startDate,
-            LocalDateTime endDate,
+            LocalDate startDate,
+            LocalDate endDate,
             Pageable pageable) {
 
-        Specification<LoanApplicationEntity> spec = (root, query, cb) -> {
+        validateDateRange(startDate, endDate);
+
+        Specification<LoanApplicationEntity> spec = buildLoanSpecification(
+                status,
+                startDate,
+                endDate
+        );
+
+        return loanRepo.findAll(spec, pageable)
+                .map(this::toResponse);
+    }
+
+    private Specification<LoanApplicationEntity> buildLoanSpecification(
+            Status status,
+            LocalDate startDate,
+            LocalDate endDate) {
+
+        return (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
 
             if (status != null) {
@@ -161,19 +207,22 @@ public class LoanApplicationService {
             }
 
             if (startDate != null) {
-                predicates.add(cb.greaterThanOrEqualTo(root.get("createdAt"), startDate));
+                LocalDateTime startDateTime = startDate.atStartOfDay();
+                predicates.add(cb.greaterThanOrEqualTo(root.get("createdAt"), startDateTime));
             }
 
             if (endDate != null) {
-                predicates.add(cb.lessThanOrEqualTo(root.get("createdAt"), endDate));
+                LocalDateTime endDateTimeExclusive = endDate.plusDays(1).atStartOfDay();
+                predicates.add(cb.lessThan(root.get("createdAt"), endDateTimeExclusive));
             }
 
             return cb.and(predicates.toArray(new Predicate[0]));
         };
-
-        return loanRepo.findAll(spec, pageable).map(this::toResponse);
     }
 
-
-    
+    private void validateDateRange(LocalDate startDate, LocalDate endDate) {
+        if (startDate != null && endDate != null && startDate.isAfter(endDate)) {
+            throw new BadRequestException("startDate cannot be after endDate");
+        }
+    }
 }
