@@ -65,12 +65,6 @@ public class LoanApplicationService {
         return toResponse(getById(id));
     }
 
-    /**
-     * Find loan applications by optional filters:
-     * - status
-     * - startDate
-     * - endDate
-     */
     @Transactional(readOnly = true)
     public List<LoanApplicationResponse> findLoan(
             Status status,
@@ -155,15 +149,15 @@ public class LoanApplicationService {
 
     @Transactional(readOnly = true)
     public List<RepaymentScheduleResponse> getSchedules(Long loanId) {
+
+        getById(loanId);
+
         return scheduleRepo.findByLoanApplicationId(loanId)
                 .stream()
                 .map(scheduleService::toResponse)
                 .toList();
     }
 
-    /**
-     * Summary total loan grouped by status.
-     */
     @Transactional(readOnly = true)
     public List<LoanSummaryByStatusResponse> getSummaryByStatus() {
         return loanRepo.summarizeTotalLoanByStatus()
@@ -186,12 +180,6 @@ public class LoanApplicationService {
                 .build();
     }
 
-    /**
-     * Find loan applications with pagination and optional filters:
-     * - status
-     * - startDate
-     * - endDate
-     */
     @Transactional(readOnly = true)
     public Page<LoanApplicationResponse> findLoanPaged(
             Status status,
@@ -218,6 +206,8 @@ public class LoanApplicationService {
 
         return (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
+
+            predicates.add(cb.isNull(root.get("customer").get("deletedAt")));
 
             if (status != null) {
                 predicates.add(cb.equal(root.get("status"), status.name()));

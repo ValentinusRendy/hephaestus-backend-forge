@@ -18,4 +18,18 @@ public interface CustomerRepository extends JpaRepository<CustomerEntity, Long> 
     boolean existsByEmail(String email);
 
     List<CustomerEntity> findByFullNameContainingIgnoreCase(String fullName);
+
+    Optional<CustomerEntity> findByIdAndDeletedAtIsNull(Long id);
+
+    Optional<CustomerEntity> findByNikAndDeletedAtIsNull(String nik);
+
+    Optional<CustomerEntity> findByEmailAndDeletedAtIsNull(String email);
+
+    boolean existsByNikAndDeletedAtIsNull(String nik);
+
+    boolean existsByEmailAndDeletedAtIsNull(String email);
+
+    List<CustomerEntity> findByDeletedAtIsNull();
+
+    List<CustomerEntity> findByFullNameContainingIgnoreCaseAndDeletedAtIsNull(String fullName);
 }

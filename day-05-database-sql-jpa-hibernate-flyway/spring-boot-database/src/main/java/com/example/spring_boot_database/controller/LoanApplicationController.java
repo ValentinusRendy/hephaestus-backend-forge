@@ -41,15 +41,6 @@ public class LoanApplicationController {
         );
     }
 
-    /**
-     * Get all loan applications with optional filters:
-     * - status
-     * - startDate
-     * - endDate
-     *
-     * Example:
-     * GET /api/v1/loan-applications?status=SUBMITTED&startDate=2026-01-01&endDate=2026-01-31
-     */
     @GetMapping
     public ApiResponse<List<LoanApplicationResponse>> getAll(
             @RequestParam(required = false) Status status,
@@ -85,12 +76,6 @@ public class LoanApplicationController {
         );
     }
 
-    /**
-     * Endpoint summary total loan by status.
-     *
-     * Example:
-     * GET /api/v1/loan-applications/summary/by-status
-     */
     @GetMapping("/summary/by-status")
     public ApiResponse<List<LoanSummaryByStatusResponse>> getSummaryByStatus() {
         return ApiResponse.success(
@@ -99,15 +84,6 @@ public class LoanApplicationController {
         );
     }
 
-    /**
-     * Get paginated loan applications with optional filters:
-     * - status
-     * - startDate
-     * - endDate
-     *
-     * Example:
-     * GET /api/v1/loan-applications/paged?status=APPROVED&startDate=2026-01-01&endDate=2026-01-31&page=0&size=10
-     */
     @GetMapping("/paged")
     public ApiResponse<org.springframework.data.domain.Page<LoanApplicationResponse>> getPaged(
             @RequestParam(required = false) Status status,

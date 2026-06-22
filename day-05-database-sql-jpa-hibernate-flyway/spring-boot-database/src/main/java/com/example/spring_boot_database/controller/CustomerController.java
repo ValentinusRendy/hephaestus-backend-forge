@@ -70,4 +70,12 @@ public class CustomerController {
                 "Outstanding amount retrieved successfully"
         );
     }
+    
+    @DeleteMapping("/{id}")
+    public ApiResponse<CustomerResponse> delete(@PathVariable Long id) {
+        return ApiResponse.success(
+                customerService.softDeleteCustomer(id),
+                "Customer deleted successfully"
+        );
+    }
 }

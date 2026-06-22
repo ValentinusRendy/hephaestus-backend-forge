@@ -18,7 +18,8 @@ import lombok.Data;
         name = "customers",
         indexes = {
                 @Index(name = "idx_customers_nik", columnList = "nik"),
-                @Index(name = "idx_customers_email", columnList = "email")
+                @Index(name = "idx_customers_email", columnList = "email"),
+                @Index(name = "idx_customers_deleted_at", columnList = "deleted_at")
         }
 )
 @Data
@@ -45,6 +46,9 @@ public class CustomerEntity {
 
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
+
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
 
     @PrePersist
     protected void onCreate() {

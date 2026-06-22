@@ -1,6 +1,7 @@
 package com.example.spring_boot_database.service;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -39,11 +40,11 @@ public class CustomerService {
     @Transactional
     public CustomerResponse createCustomer(CreateCustomerRequest request) {
 
-        if (customerRepository.existsByNik(request.getNik())) {
+        if (customerRepository.existsByNikAndDeletedAtIsNull(request.getNik())) {
             throw new DuplicateCustomerException("nik", request.getNik());
         }
 
-        if (customerRepository.existsByEmail(request.getEmail())) {
+        if (customerRepository.existsByEmailAndDeletedAtIsNull(request.getEmail())) {
             throw new DuplicateCustomerException("email", request.getEmail());
         }
 
@@ -55,7 +56,7 @@ public class CustomerService {
 
     @Transactional(readOnly = true)
     public CustomerEntity getById(Long id) {
-        return customerRepository.findById(id)
+        return customerRepository.findByIdAndDeletedAtIsNull(id)
                 .orElseThrow(() -> new CustomerNotFoundException(id));
     }
 
@@ -67,8 +68,8 @@ public class CustomerService {
     @Transactional(readOnly = true)
     public List<CustomerResponse> findCustomer(String name) {
         return (name != null && !name.isBlank()
-                ? customerRepository.findByFullNameContainingIgnoreCase(name)
-                : customerRepository.findAll())
+                ? customerRepository.findByFullNameContainingIgnoreCaseAndDeletedAtIsNull(name)
+                : customerRepository.findByDeletedAtIsNull())
                 .stream()
                 .map(this::toResponse)
                 .toList();
@@ -97,6 +98,18 @@ public class CustomerService {
                 .customerId(customerId)
                 .outstandingAmount(outstandingAmount)
                 .build();
+    }
+
+    @Transactional
+    public CustomerResponse softDeleteCustomer(Long id) {
+
+        CustomerEntity customer = getById(id);
+
+        customer.setDeletedAt(LocalDateTime.now());
+
+        CustomerEntity updated = customerRepository.save(customer);
+
+        return toResponse(updated);
     }
 
     private LoanApplicationResponse toLoanResponse(LoanApplicationEntity loan) {

@@ -41,9 +41,12 @@ public interface RepaymentScheduleRepository extends JpaRepository<RepaymentSche
                 FROM repayment_schedules rs
                 JOIN loan_applications la
                     ON la.id = rs.loan_application_id
+                JOIN customers c
+                    ON c.id = la.customer_id
                 LEFT JOIN payment_transactions pt
                     ON pt.repayment_schedule_id = rs.id
                 WHERE la.customer_id = :customerId
+                  AND c.deleted_at IS NULL
                 GROUP BY rs.id, rs.total_amount
             ) x
             """, nativeQuery = true)
